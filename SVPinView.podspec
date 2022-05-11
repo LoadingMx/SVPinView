@@ -18,6 +18,6 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/xornorik/SVPinView.git", :tag => "#{s.version}" }
   s.source_files = "SVPinView/Source/**/*.{swift}"
 
-  s.resources = "SVPinView/Source/**/*.{png,jpeg,jpg,storyboard,xib,xcassets`}"
+  # s.resources = "SVPinView/Source/**/*.{png,jpeg,jpg,storyboard,xib,xcassets`}"
 
 end

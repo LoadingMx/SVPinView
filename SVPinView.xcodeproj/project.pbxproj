@@ -18,9 +18,7 @@
 		ACE199BE204556340041203C /* SVPinView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SVPinView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACE199C1204556340041203C /* SVPinView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SVPinView.h; sourceTree = "<group>"; };
 		ACE199C2204556340041203C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		ACE199C92045566E0041203C /* SVPinCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SVPinCell.xib; sourceTree = "<group>"; };
 		ACE199CA2045566E0041203C /* SVPinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVPinView.swift; sourceTree = "<group>"; };
-		ACE199CB2045566E0041203C /* SVPinView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SVPinView.xib; sourceTree = "<group>"; };
 		B31AAF962089E8D4004F5BE4 /* SVPinField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVPinField.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -39,7 +37,6 @@
 			isa = PBXGroup;
 			children = (
 				ACE199CD204584680041203C /* Classes */,
-				ACE199CE204584930041203C /* XIB's */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -103,15 +100,6 @@
 				B31AAF962089E8D4004F5BE4 /* SVPinField.swift */,
 			);
 			path = Classes;
-			sourceTree = "<group>";
-		};
-		ACE199CE204584930041203C /* XIB's */ = {
-			isa = PBXGroup;
-			children = (
-				ACE199C92045566E0041203C /* SVPinCell.xib */,
-				ACE199CB2045566E0041203C /* SVPinView.xib */,
-			);
-			path = "XIB's";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

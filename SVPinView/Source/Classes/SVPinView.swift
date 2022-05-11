@@ -38,14 +38,44 @@ private class SVPinViewFlowLayout: UICollectionViewFlowLayout {
 public class SVPinView: UIView {
     
     // MARK: - Private Properties -
-    @IBOutlet fileprivate var collectionView: UICollectionView!
-    @IBOutlet fileprivate var errorView: UIView!
+//    @IBOutlet fileprivate var collectionView: UICollectionView!
+//    @IBOutlet fileprivate var errorView: UIView!
     
-    fileprivate var flowLayout: UICollectionViewFlowLayout {
-        self.collectionView.collectionViewLayout = SVPinViewFlowLayout()
-        return self.collectionView?.collectionViewLayout as! UICollectionViewFlowLayout
-    }
+    lazy var collectionView: UICollectionView = {
+        let flowLayout = SVPinViewFlowLayout()
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView.backgroundColor = UIColor.clear
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        flowLayout.scrollDirection = .vertical
+        collectionView.isScrollEnabled = false
+        collectionView.register(SVPinCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "UICollectionViewCell")
+        
+        return collectionView
+    }()
     
+    lazy var errorView: UIView = {
+        let errorView = UIView()
+        errorView.addSubview(refreshButton)
+        return errorView
+    }()
+    lazy var refreshButton : UIButton = {
+        let refreshButton = UIButton(type: .custom)
+        refreshButton.setTitle("⚠ ERROR: Please check the console for details.\nRetry?", for: .normal)
+        refreshButton.addTarget(self, action: #selector(refreshPinView), for: .touchUpInside)
+        return refreshButton
+    }()
+//    lazy var view: UIView = {
+//        let view = UIView()
+//        return view
+//    }()
+    
+//    fileprivate var flowLayout: UICollectionViewFlowLayout {
+//        self.collectionView.collectionViewLayout = SVPinViewFlowLayout()
+//        return self.collectionView.collectionViewLayout as! UICollectionViewFlowLayout
+//    }
+//
     fileprivate var view: UIView!
     fileprivate var reuseIdentifier = "SVPinCell"
     fileprivate var isLoading = true
@@ -101,23 +131,65 @@ public class SVPinView: UIView {
     }
     
     private func loadView(completionHandler: (()->())? = nil) {
-        let podBundle = Bundle(for: SVPinView.self)
-        let nib = UINib(nibName: "SVPinView", bundle: podBundle)
-        view = nib.instantiate(withOwner: self, options: nil)[0] as? UIView
+//        let podBundle = Bundle(for: SVPinView.self)
+//        let nib = UINib(nibName: "SVPinView", bundle: podBundle)
+//        view = nib.instantiate(withOwner: self, options: nil)[0] as? UIView
         
         // for CollectionView
-        let collectionViewNib = UINib(nibName: "SVPinCell", bundle: podBundle)
-        collectionView.register(collectionViewNib, forCellWithReuseIdentifier: reuseIdentifier)
-        flowLayout.scrollDirection = .vertical
-        collectionView.isScrollEnabled = false
-                
-        self.addSubview(view)
+//        let collectionViewNib = UINib(nibName: "SVPinCell", bundle: podBundle)
+//        collectionView.register(collectionViewNib, forCellWithReuseIdentifier: reuseIdentifier)
+//        flowLayout.scrollDirection = .vertical
+//        collectionView.isScrollEnabled = false
+//
+//        self.addSubview(view)
+//        view.frame = bounds
+//        view.autoresizingMask = [UIView.AutoresizingMask.flexibleWidth, UIView.AutoresizingMask.flexibleHeight]
+        
+//        let view = SVPinView()
+        view = UIView()
+        addSubview(view)
         view.frame = bounds
         view.autoresizingMask = [UIView.AutoresizingMask.flexibleWidth, UIView.AutoresizingMask.flexibleHeight]
-        
+        setupViews()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             completionHandler?()
         }
+    }
+    
+    private func setupViews() {
+        view.addSubview(collectionView)
+        view.addSubview(errorView)
+        layoutCollectionView()
+        layoutErrorView()
+        layoutrefreshButton()
+    }
+    
+    private func layoutCollectionView() {
+        
+        let top = NSLayoutConstraint(item: collectionView, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0)
+        let left = NSLayoutConstraint(item: collectionView, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1, constant: 0)
+        let bottom = NSLayoutConstraint(item: collectionView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
+        let right = NSLayoutConstraint(item: collectionView, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        view.addConstraints([top, left, bottom, right])
+    }
+    private func layoutErrorView() {
+        
+        let top = NSLayoutConstraint(item: errorView, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0)
+        let left = NSLayoutConstraint(item: errorView, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1, constant: 0)
+        let bottom = NSLayoutConstraint(item: errorView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
+        let right = NSLayoutConstraint(item: errorView, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0)
+        errorView.translatesAutoresizingMaskIntoConstraints = false
+        view.addConstraints([top, left, bottom, right])
+    }
+    private func layoutrefreshButton() {
+        
+        let top = NSLayoutConstraint(item: refreshButton, attribute: .top, relatedBy: .equal, toItem: errorView, attribute: .top, multiplier: 1, constant: 0)
+        let left = NSLayoutConstraint(item: refreshButton, attribute: .left, relatedBy: .equal, toItem: errorView, attribute: .left, multiplier: 1, constant: 0)
+        let bottom = NSLayoutConstraint(item: refreshButton, attribute: .bottom, relatedBy: .equal, toItem: errorView, attribute: .bottom, multiplier: 1, constant: 0)
+        let right = NSLayoutConstraint(item: refreshButton, attribute: .right, relatedBy: .equal, toItem: errorView, attribute: .right, multiplier: 1, constant: 0)
+        refreshButton.translatesAutoresizingMaskIntoConstraints = false
+        errorView.addConstraints([top, left, bottom, right])
     }
     
     // MARK: - Private methods -
@@ -230,12 +302,17 @@ public class SVPinView: UIView {
         }
      }
     
-    @IBAction fileprivate func refreshPinView(completionHandler: (()->())? = nil) {
-        view.removeFromSuperview()
-        view = nil
+    @objc func refreshPinView(completionHandler: (()->())? = nil) {
+//        view.removeFromSuperview()
+//        view = nil
         isLoading = true
         errorView.isHidden = true
-        loadView(completionHandler: completionHandler)
+//        loadView(completionHandler: completionHandler)
+        collectionView.visibleCells.forEach { cell in
+            let c = cell as? SVPinCell
+            c?.clear()
+        }
+        collectionView.reloadData()
     }
     
     fileprivate func showPinError(error: String) {
@@ -321,16 +398,17 @@ extension SVPinView : UICollectionViewDataSource, UICollectionViewDelegate, UICo
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
         
-        guard let textField = cell.viewWithTag(100) as? SVPinField,
-            let containerView = cell.viewWithTag(51),
-            let underLine = cell.viewWithTag(50),
-            let placeholderLabel = cell.viewWithTag(400) as? UILabel
-        else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? SVPinCell else {
             showPinError(error: "ERR-104: Tag Mismatch")
-            return UICollectionViewCell()
+            let dCell = collectionView.dequeueReusableCell(withReuseIdentifier: "UICollectionViewCell", for: indexPath)
+            return dCell
         }
+        
+        let textField = cell.textField
+        let containerView = cell.containerView
+        let underLine = cell.underLine
+        let placeholderLabel = cell.placeholderLabel
         
         // Setting up textField
         textField.tag = 101 + indexPath.row
@@ -403,7 +481,7 @@ extension SVPinView : UICollectionViewDataSource, UICollectionViewDelegate, UICo
     }
     
     public override func layoutSubviews() {
-        flowLayout.invalidateLayout()
+        collectionView.collectionViewLayout.invalidateLayout()
     }
 }
 // MARK: - TextField Methods -
@@ -454,4 +532,89 @@ extension SVPinView : UITextFieldDelegate
         }
         return true
     }
+}
+
+
+public class SVPinCell: UICollectionViewCell {
+    
+    lazy var containerView: UIView = {
+        let containerView = UIView()
+        containerView.backgroundColor = UIColor.white
+        containerView.tag = 51
+        return containerView
+    }()
+    lazy var textField: SVPinField = {
+        let textField = SVPinField()
+        textField.font = UIFont.systemFont(ofSize: 18)
+        textField.textColor = UIColor.black
+        textField.textAlignment = .center
+        textField.tag = 100
+        return textField
+    }()
+    lazy var underLine: UIView = {
+        let underLine = UIView()
+        underLine.backgroundColor = UIColor.black
+        underLine.tag = 50
+        return underLine
+    }()
+    lazy var placeholderLabel: UILabel = {
+        let placeholderLabel = UILabel()
+        placeholderLabel.font = UIFont.systemFont(ofSize: 18)
+        placeholderLabel.textAlignment = .center
+        placeholderLabel.tag = 400
+        return placeholderLabel
+    }()
+    
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupViews()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setupViews() {
+        contentView.addSubview(containerView)
+        containerView.addSubview(textField)
+        containerView.addSubview(underLine)
+        containerView.addSubview(placeholderLabel)
+        
+        let ctop = NSLayoutConstraint(item: containerView, attribute: .top, relatedBy: .equal, toItem: contentView, attribute: .top, multiplier: 1, constant: 0)
+        let cleft = NSLayoutConstraint(item: containerView, attribute: .left, relatedBy: .equal, toItem: contentView, attribute: .left, multiplier: 1, constant: 0)
+        let cbottom = NSLayoutConstraint(item: containerView, attribute: .bottom, relatedBy: .equal, toItem: contentView, attribute: .bottom, multiplier: 1, constant: 0)
+        let cright = NSLayoutConstraint(item: containerView, attribute: .right, relatedBy: .equal, toItem: contentView, attribute: .right, multiplier: 1, constant: 0)
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addConstraints([ctop, cleft, cbottom, cright])
+        
+        let ttop = NSLayoutConstraint(item: textField, attribute: .top, relatedBy: .equal, toItem: containerView, attribute: .top, multiplier: 1, constant: 0)
+        let tleft = NSLayoutConstraint(item: textField, attribute: .left, relatedBy: .equal, toItem: containerView, attribute: .left, multiplier: 1, constant: 0)
+        let tbottom = NSLayoutConstraint(item: textField, attribute: .bottom, relatedBy: .equal, toItem: underLine, attribute: .top, multiplier: 1, constant: 0)
+        let tright = NSLayoutConstraint(item: textField, attribute: .right, relatedBy: .equal, toItem: containerView, attribute: .right, multiplier: 1, constant: 0)
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addConstraints([ttop, tleft, tbottom, tright])
+        
+        // let utop = NSLayoutConstraint(item: underLine, attribute: .top, relatedBy: .equal, toItem: contentView, attribute: .top, multiplier: 1, constant: 0)
+        let uleft = NSLayoutConstraint(item: underLine, attribute: .left, relatedBy: .equal, toItem: containerView, attribute: .left, multiplier: 1, constant: 0)
+        let ubottom = NSLayoutConstraint(item: underLine, attribute: .bottom, relatedBy: .equal, toItem: containerView, attribute: .bottom, multiplier: 1, constant: 0)
+        let uright = NSLayoutConstraint(item: underLine, attribute: .right, relatedBy: .equal, toItem: containerView, attribute: .right, multiplier: 1, constant: 0)
+        let uheight = NSLayoutConstraint(item: underLine, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 3)
+        uheight.identifier = "underlineHeight"
+        underLine.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addConstraints([uleft, ubottom, uright, uheight])
+        
+        let ptop = NSLayoutConstraint(item: placeholderLabel, attribute: .top, relatedBy: .equal, toItem: containerView, attribute: .top, multiplier: 1, constant: 0)
+        let pleft = NSLayoutConstraint(item: placeholderLabel, attribute: .left, relatedBy: .equal, toItem: containerView, attribute: .left, multiplier: 1, constant: 0)
+        let pbottom = NSLayoutConstraint(item: placeholderLabel, attribute: .bottom, relatedBy: .equal, toItem: containerView, attribute: .bottom, multiplier: 1, constant: 0)
+        let pright = NSLayoutConstraint(item: placeholderLabel, attribute: .right, relatedBy: .equal, toItem: containerView, attribute: .right, multiplier: 1, constant: 0)
+        placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addConstraints([ptop, pleft, pbottom, pright])
+        
+    }
+    
+    func clear() {
+        textField.text = nil
+        placeholderLabel.isHidden = false
+    }
+    
 }
